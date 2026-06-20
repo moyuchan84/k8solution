@@ -1,0 +1,15 @@
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.9.2
+pydantic-settings==2.6.1
+kubernetes==31.0.0
+PyGithub==2.4.0
+httpx==0.27.2
+redis[hiredis]==5.1.1
+python-jose[cryptography]==3.3.0
+python-ldap==3.4.4
+pyyaml==6.0.2
+jinja2==3.1.4
+python-dotenv==1.0.1
+# LLM 연동 (선택적 — LLM_ENABLED=true 시 필요)
+langchain-openai==0.2.14

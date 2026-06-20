@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ tenant_id }}-{{ project_name }}
+  namespace: argocd
+  labels:
+    team: {{ tenant_id }}
+    project: {{ project_name }}
+    managed-by: gitops-platform
+spec:
+  project: default
+  source:
+    repoURL: https://{{ gitops_repo | default('github.samsungds.net/infra-team/gitops-manifests') }}
+    targetRevision: main
+    path: tenants/{{ tenant_id }}/{{ project_name }}
+    helm:
+      valueFiles:
+      - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=false
