@@ -1,0 +1,56 @@
+serviceName: gitops-platform-backend
+tenantId: gitops-platform
+namespace: gitops-platform
+environment: production
+team: platform
+
+image:
+  repository: harbor.foundrymtc.samsungds.net/platform/gitops-backend
+  tag: latest
+  pullPolicy: Always
+
+size: M
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+containerPort: 8000
+servicePort: 80
+
+healthcheck:
+  readinessPath: /health
+  livenessPath: /healthz
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  failureThreshold: 3
+
+ingress:
+  enabled: true
+  domainSuffix: swsol.samsungds.net
+  gateway: istio-system/global-gateway
+
+networkPolicy:
+  enabled: true
+  extraEgressRules:
+    # Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - port: 6379
+    # PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgres
+      ports:
+        - port: 5432
+
+serviceAccount:
+  create: true
+  name: gitops-platform-backend
+  annotations: {}

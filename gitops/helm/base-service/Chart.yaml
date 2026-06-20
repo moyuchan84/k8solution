@@ -1,0 +1,13 @@
+apiVersion: v2
+name: base-service
+description: K8s GitOps Self-Service Platform — 개발팀 서비스용 공통 Helm Chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - gitops
+  - k8s
+  - samsung
+maintainers:
+  - name: SW Platform Team
+    email: platform@samsungds.net

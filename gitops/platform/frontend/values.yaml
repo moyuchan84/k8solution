@@ -1,0 +1,49 @@
+serviceName: gitops-platform-frontend
+tenantId: gitops-platform
+namespace: gitops-platform
+environment: production
+team: platform
+
+image:
+  repository: harbor.foundrymtc.samsungds.net/platform/gitops-frontend
+  tag: latest
+  pullPolicy: Always
+
+size: S
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+
+containerPort: 3000
+servicePort: 80
+
+healthcheck:
+  readinessPath: /api/health
+  livenessPath: /api/health
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 3
+
+ingress:
+  enabled: true
+  domainSuffix: swsol.samsungds.net
+  gateway: istio-system/global-gateway
+
+networkPolicy:
+  enabled: true
+  extraEgressRules:
+    # 백엔드 API 호출 허용
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: gitops-platform-backend
+      ports:
+        - port: 80
+
+serviceAccount:
+  create: true
+  name: gitops-platform-frontend
+  annotations: {}

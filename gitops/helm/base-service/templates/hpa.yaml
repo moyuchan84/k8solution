@@ -1,0 +1,29 @@
+{{- if .Values.hpa.enabled }}
+{{- $size := .Values.size | default "M" }}
+{{- $minReplicas := .Values.hpa.minReplicas | default (index .Values.replicaCount $size) }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.serviceName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.serviceName }}
+    app.kubernetes.io/part-of: {{ .Values.tenantId }}
+    team: {{ .Values.team | default .Values.tenantId }}
+    env: {{ .Values.environment }}
+    managed-by: gitops-platform
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.serviceName }}
+  minReplicas: {{ $minReplicas }}
+  maxReplicas: {{ .Values.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.hpa.targetCPUUtilizationPercentage }}
+{{- end }}

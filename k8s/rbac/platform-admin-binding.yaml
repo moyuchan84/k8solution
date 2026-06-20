@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitops-platform-admin-binding
+  labels:
+    managed-by: gitops-platform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gitops-platform-admin
+subjects:
+  # 플랫폼 백엔드가 사용하는 ServiceAccount
+  - kind: ServiceAccount
+    name: gitops-platform-backend
+    namespace: gitops-platform

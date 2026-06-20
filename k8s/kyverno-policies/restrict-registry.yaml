@@ -1,0 +1,33 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-image-registry
+  annotations:
+    policies.kyverno.io/title: Restrict Image Registry
+    policies.kyverno.io/description: >
+      사내 Harbor 레지스트리(harbor.foundrymtc.samsungds.net)에서만
+      이미지를 Pull 할 수 있도록 강제합니다.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: validate-image-registry
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchExpressions:
+                  - key: managed-by
+                    operator: In
+                    values:
+                      - gitops-platform
+      validate:
+        message: "이미지는 harbor.foundrymtc.samsungds.net 에서만 Pull 가능합니다."
+        pattern:
+          spec:
+            containers:
+              - image: "harbor.foundrymtc.samsungds.net/*"
+            =(initContainers):
+              - image: "harbor.foundrymtc.samsungds.net/*"
