@@ -1,0 +1,47 @@
+replicaCount: {{ replicas }}
+
+image:
+  repository: harbor.foundrymtc.samsungds.net/{{ harbor_project }}/app
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: "{{ cpu_request }}"
+    memory: "{{ mem_request }}"
+  limits:
+    cpu: "{{ cpu_limit }}"
+    memory: "{{ mem_limit }}"
+
+serviceAccount:
+  name: {{ project_name }}
+
+labels:
+  app.kubernetes.io/name: {{ project_name }}
+  app.kubernetes.io/part-of: {{ tenant_id }}
+  team: {{ tenant_id }}
+  env: production
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 80
+  initialDelaySeconds: 30
+  periodSeconds: 30
+
+autoscaling:
+  enabled: false
+  minReplicas: {{ replicas }}
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80

@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ project_name }}
+  namespace: {{ namespace }}
+  labels:
+    app.kubernetes.io/name: {{ project_name }}
+    app.kubernetes.io/part-of: {{ tenant_id }}
+spec:
+  hosts:
+  - {{ project_name }}.{{ domain_suffix }}
+  gateways:
+  - istio-system/global-gateway
+  http:
+  - route:
+    - destination:
+        host: {{ project_name }}
+        port:
+          number: 80
