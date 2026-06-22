@@ -26,7 +26,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,6 +37,11 @@ app.include_router(tenants.router, prefix="/api/v1/tenants", tags=["tenants"])
 app.include_router(projects.router, prefix="/api/v1/projects", tags=["projects"])
 app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["tasks"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
+
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
 
 
 @app.get("/healthz")

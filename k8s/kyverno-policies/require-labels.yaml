@@ -1,0 +1,35 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-gitops-labels
+  annotations:
+    policies.kyverno.io/title: Required GitOps Labels
+    policies.kyverno.io/description: >
+      모든 워크로드(Deployment, StatefulSet, DaemonSet)에
+      app.kubernetes.io/name, team, env 라벨을 강제합니다.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-deployment-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+              namespaceSelector:
+                matchExpressions:
+                  - key: managed-by
+                    operator: In
+                    values:
+                      - gitops-platform
+      validate:
+        message: "app.kubernetes.io/name, team, env 라벨이 필요합니다."
+        pattern:
+          metadata:
+            labels:
+              app.kubernetes.io/name: "?*"
+              team: "?*"
+              env: "?*"

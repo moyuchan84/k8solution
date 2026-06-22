@@ -1,0 +1,46 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-default-networkpolicy
+  annotations:
+    policies.kyverno.io/title: Add Default NetworkPolicy
+    policies.kyverno.io/description: >
+      플랫폼이 관리하는 Namespace 생성 시 기본 default-deny NetworkPolicy를
+      자동으로 추가합니다. (Namespace에 managed-by: gitops-platform 라벨 필요)
+spec:
+  rules:
+    - name: generate-default-deny
+      match:
+        any:
+          - resources:
+              kinds:
+                - Namespace
+              selector:
+                matchLabels:
+                  managed-by: gitops-platform
+      generate:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        name: default-deny-all
+        namespace: "{{`{{request.object.metadata.name}}`}}"
+        synchronize: true
+        data:
+          metadata:
+            labels:
+              managed-by: gitops-platform
+          spec:
+            podSelector: {}
+            policyTypes:
+              - Ingress
+              - Egress
+            egress:
+              # DNS 허용
+              - to:
+                  - namespaceSelector:
+                      matchLabels:
+                        kubernetes.io/metadata.name: kube-system
+                ports:
+                  - port: 53
+                    protocol: UDP
+                  - port: 53
+                    protocol: TCP

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitops-platform
+  labels:
+    kubernetes.io/metadata.name: gitops-platform
+    managed-by: gitops-platform
+    team: platform

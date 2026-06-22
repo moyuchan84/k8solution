@@ -1,0 +1,118 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# base-service Helm Chart 기본값
+# 리소스 사이즈: S(small) / M(medium) / L(large) — CLAUDE.md 테이블 기준
+# ─────────────────────────────────────────────────────────────────────────────
+
+# 서비스 기본 정보
+serviceName: ""          # 반드시 오버라이드 (예: my-service)
+tenantId: ""             # 부서 네임스페이스 (예: sw-platform-team)
+namespace: ""            # 배포 대상 K8s 네임스페이스 (tenantId와 동일)
+environment: production  # production | staging | development
+team: ""                 # 팀 식별자 (라벨용)
+
+# 컨테이너 이미지
+image:
+  repository: ""          # harbor.foundrymtc.samsungds.net/{tenant}/{service}
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# 리소스 사이즈 (S/M/L 매핑 — 오케스트레이터가 values.yaml 생성 시 선택)
+size: M
+
+# 사이즈별 리소스 정의 (오버라이드 가능)
+resources:
+  S:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  M:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  L:
+    requests:
+      cpu: 1000m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+# 레플리카 (사이즈별 기본값)
+replicaCount:
+  S: 1
+  M: 2
+  L: 3
+
+# 컨테이너 포트
+containerPort: 8080
+servicePort: 80
+
+# 헬스체크 경로
+healthcheck:
+  readinessPath: /health
+  livenessPath: /health
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 3
+
+# HPA 설정
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# 환경변수 (기본 빈 목록)
+env: []
+# - name: DATABASE_URL
+#   valueFrom:
+#     secretKeyRef:
+#       name: my-service-db
+#       key: url
+
+envFrom: []
+# - secretRef:
+#     name: my-service-secrets
+
+# ExternalSecret (외부 DB 연결)
+externalSecret:
+  enabled: false
+  refreshInterval: 1h
+  secretStoreName: vault-backend      # ClusterSecretStore 이름
+  secretStoreKind: ClusterSecretStore
+  target:
+    name: ""   # 비워두면 {serviceName}-secrets 로 자동 생성
+  data: []
+  # - secretKey: DATABASE_URL
+  #   remoteRef:
+  #     key: secret/data/my-service
+  #     property: database_url
+
+# Ingress (Istio VirtualService)
+ingress:
+  enabled: true
+  domainSuffix: swsol.samsungds.net
+  gateway: istio-system/global-gateway
+
+# NetworkPolicy
+networkPolicy:
+  enabled: true
+  # 추가 Egress 허용 규칙 (기본: DNS + 같은 namespace)
+  extraEgressRules: []
+  # - to:
+  #   - ipBlock:
+  #       cidr: 10.0.0.0/8
+  #   ports:
+  #   - port: 5432
+
+# ServiceAccount
+serviceAccount:
+  create: true
+  name: ""   # 비워두면 {serviceName} 으로 자동 생성
+  annotations: {}

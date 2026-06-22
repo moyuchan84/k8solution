@@ -1,0 +1,47 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gitops-platform-admin
+  labels:
+    managed-by: gitops-platform
+rules:
+  # Namespace 관리 (생성/조회)
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # 리소스 쿼터·제한
+  - apiGroups: [""]
+    resources: ["resourcequotas", "limitranges"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # ServiceAccount 관리
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # RBAC 관리
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "rolebindings", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # NetworkPolicy 관리
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["networkpolicies"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # ArgoCD Application 관리
+  - apiGroups: ["argoproj.io"]
+    resources: ["applications", "applicationsets", "appprojects"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "sync"]
+  # ARC RunnerSet 관리
+  - apiGroups: ["actions.github.com"]
+    resources: ["autoscalingrunnersets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Istio VirtualService 관리
+  - apiGroups: ["networking.istio.io"]
+    resources: ["virtualservices", "destinationrules", "gateways"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # ExternalSecret 관리
+  - apiGroups: ["external-secrets.io"]
+    resources: ["externalsecrets", "secretstores", "clustersecretstores"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Pod/Deployment 읽기 (상태 조회용)
+  - apiGroups: ["", "apps"]
+    resources: ["pods", "deployments", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "watch"]

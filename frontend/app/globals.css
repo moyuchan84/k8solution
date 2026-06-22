@@ -1,0 +1,118 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────
+   Toss 디자인 토큰 — CSS 커스텀 프로퍼티
+   ───────────────────────────────────────────── */
+:root {
+  /* 컬러 */
+  --color-primary: #3182f6;
+  --color-primary-hover: #2272eb;
+  --color-primary-light: #e8f3ff;
+
+  --color-bg: #ffffff;
+  --color-surface: #f2f4f6;
+  --color-border: #e5e8eb;
+  --color-border-strong: #d1d6db;
+
+  --color-text-heading: #191f28;
+  --color-text-body: #6b7684;
+  --color-text-caption: #8b95a1;
+  --color-text-placeholder: #b0b8c1;
+  --color-text-emphasis: #4e5968;
+  --color-text-strong: #333d4b;
+
+  --color-success: #03b26c;
+  --color-error: #f04452;
+  --color-warning: #fe9800;
+
+  /* 사이드바 너비 */
+  --sidebar-width: 240px;
+
+  /* 그림자 */
+  --shadow-subtle: 0px 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0px 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0px 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0px 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+/* ─────────────────────────────────────────────
+   베이스 리셋
+   ───────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  font-size: 16px;
+  color: var(--color-text-body);
+  background-color: var(--color-bg);
+}
+
+body {
+  margin: 0;
+  font-family:
+    "Pretendard Variable",
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    "Noto Sans KR",
+    sans-serif;
+}
+
+/* 스크롤바 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+
+/* 폼 리셋 */
+input,
+textarea,
+select {
+  outline: none;
+  font-family: inherit;
+}
+
+/* ─────────────────────────────────────────────
+   유틸리티 클래스
+   ───────────────────────────────────────────── */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 스켈레톤 shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f2f4f6 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    #f2f4f6 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+  border-radius: 8px;
+}

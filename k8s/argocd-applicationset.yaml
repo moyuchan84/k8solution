@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tenant-services
+  namespace: argocd
+  labels:
+    managed-by: gitops-platform
+spec:
+  generators:
+    # gitops-manifests 레포의 tenants/{tenant}/{project}/ 디렉터리를 자동 스캔
+    - git:
+        repoURL: https://github.samsungds.net/infra-team/gitops-manifests.git
+        revision: main
+        directories:
+          - path: "tenants/*/*"
+  template:
+    metadata:
+      # 경로에서 tenant/project 추출: tenants/sw-platform-team/my-service
+      name: "{{`{{path.basenameNormalized}}`}}-{{`{{path[1]}}`}}"
+      namespace: argocd
+      labels:
+        managed-by: gitops-platform
+        tenant: "{{`{{path[1]}}`}}"
+      annotations:
+        notifications.argoproj.io/subscribe.on-sync-succeeded.slack: platform-alerts
+    spec:
+      project: default
+      source:
+        repoURL: https://github.samsungds.net/infra-team/gitops-manifests.git
+        targetRevision: main
+        path: "{{`{{path}}`}}"
+        helm:
+          valueFiles:
+            - values.yaml
+          chart: ""
+          # base-service chart는 gitops/helm/base-service 참조
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{`{{path[1]}}`}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=false   # Namespace는 플랫폼이 별도 관리
+          - ServerSideApply=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
